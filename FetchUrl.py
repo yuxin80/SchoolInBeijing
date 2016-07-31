@@ -6,6 +6,9 @@ import sys
 import urllib.request
 import re
 from bs4 import *
+import imp
+
+imp.reload(sys)
 
 #sys.stdout = io.TextIOWrapper(sys.stdout.buffer,encoding='utf8')
 
@@ -17,18 +20,34 @@ xuequfang = "xuequfang"
 
 html = urllib.request.urlopen(baseurl+xuequfang).read()
 
-soup = BeautifulSoup(html,"html.parser")
+htmlStr = str(html,'utf8')
 
+soup = BeautifulSoup(htmlStr,"html.parser")
+
+#find the link for middle school entry
 allLinks = soup.find_all('a',href=True)
 
 zhongxueLink = ''
-ref = re.compile("中学",re.S)
+restr = "中学\d+所"
+ref = re.compile(restr)
 for link in allLinks:
-    result = ref.match(str(link))
-    print(str(link)+ ' ' + str(result))
-    if result:
-        zhongxueLink = link["href"]
+     result = ref.search(str(link))
+    #  print(result)
+    #  print(str(link)+': '+ str(result))
+     if result:
+         zhongxueLink = link["href"]
 
 print(baseurl+zhongxueLink)
-#print(soup)
-#print(root.prettify().encode("gbk", errors = "ignore").decode("gbk"))
+
+#get the data for all schools
+i=1
+
+lists = soup.find_all('ul')
+
+for l in lists:
+    # print(l.prettify())
+    schools = l.children
+    # print(schools)
+    # print("-----------------------------")
+    for c in schools:
+        print(c)
